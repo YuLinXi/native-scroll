@@ -346,7 +346,6 @@ export default {
   transition-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
   transition-duration: 0ms;
   position: relative;
-  z-index: 2;
   background-color: #fff;
 }
 .pullDown-loading {

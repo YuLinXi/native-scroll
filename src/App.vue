@@ -1,8 +1,9 @@
 <template>
   <div>
-    <scroll @refresh="handleRefresh" @load="handleLoad">
+    <scroll ref="scroll" @refresh="handleRefresh" @load="handleLoad">
       <div v-for="item in dataSource" class="item" :key="item">{{ item }}</div>
     </scroll>
+    <div @click="handleGoTop" class="toTop">回到顶部</div>
   </div>
 </template>
 
@@ -52,6 +53,11 @@ export default {
         data.push(index);
       }
       return data;
+    },
+
+    handleGoTop() {
+      const { scroll } = this.$refs;
+      scroll.scrollTo(0, 100);
     }
   }
 };
@@ -64,5 +70,12 @@ export default {
   &:first-child {
     border-top: 0;
   }
+}
+.toTop {
+  color: #000;
+  background-color: aqua;
+  position: fixed;
+  right: 20px;
+  bottom: 50px;
 }
 </style>

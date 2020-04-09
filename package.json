@@ -8,6 +8,14 @@
     "test:unit": "vue-cli-service test:unit",
     "lint": "vue-cli-service lint"
   },
+  "browser": "./package/Index.vue",
+  "files": [
+    "packages",
+    "README.md",
+    "lib",
+    "package.json",
+    "package-lock.json"
+  ],
   "dependencies": {
     "core-js": "^3.6.4",
     "lodash": "^4.17.15",

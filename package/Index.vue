@@ -1,7 +1,7 @@
 <template>
   <div ref="wrapper" class="NScroll-wrapper">
     <div ref="pull" class="pullDown-loading">
-      <img src="/images/loading.gif" alt="" />
+      <img src="./loading.gif" alt="" />
     </div>
     <div ref="scroll" class="NScroll-content">
       <slot></slot>

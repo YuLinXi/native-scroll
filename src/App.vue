@@ -8,7 +8,7 @@
 </template>
 
 <script>
-import Scroll from "./components/Index";
+import Scroll from "../package/Index";
 
 let index = 1;
 

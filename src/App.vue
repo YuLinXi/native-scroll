@@ -1,32 +1,57 @@
 <template>
   <div>
     <scroll @refresh="handleRefresh" @load="handleLoad">
-      <div class="item" v-for="item in 100">{{ item }}</div>
+      <div v-for="item in dataSource" class="item" :key="item">{{ item }}</div>
     </scroll>
   </div>
 </template>
 
 <script>
 import Scroll from "./components/Index";
+
+let index = 1;
+
 export default {
   name: "App",
+  data() {
+    return {
+      dataSource: []
+    };
+  },
   components: {
     Scroll
   },
+  mounted() {
+    this.dataSource = this.getDataSource();
+  },
   methods: {
     handleRefresh() {
-      return new Promise((resolve, reject) => {
+      return new Promise(resolve => {
         setTimeout(() => {
-          reject(new Error("111"));
+          index = 1;
+          this.dataSource = this.getDataSource();
+          console.log("refresh");
+          resolve();
         }, 1000);
       });
     },
     handleLoad() {
-      return new Promise((resolve, reject) => {
+      return new Promise(resolve => {
         setTimeout(() => {
-          reject(new Error("222"));
+          this.dataSource = this.dataSource.concat(this.getDataSource());
+          console.log("load");
+          resolve();
         }, 2000);
       });
+    },
+
+    getDataSource() {
+      const result = index + 20;
+      const data = [];
+      for (index; index < result; index++) {
+        data.push(index);
+      }
+      return data;
     }
   }
 };

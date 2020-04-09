@@ -73,11 +73,6 @@ export default {
   computed: {
     relOptions() {
       return Object.assign({}, DEFAULT_OPTIONS, this.options);
-    },
-    loadEndText() {
-      if (!this.loadEndText) {
-        return;
-      }
     }
   },
   mounted() {
@@ -109,9 +104,14 @@ export default {
     },
 
     _pullReset() {
+      this._pullEl.classList.add("pending");
+      this._pullEl.classList.remove("pulling");
+      this._pullEl.classList.remove("refreshing");
+      this._pullEl.classList.remove("releasing");
       this._pullEl.style.height = "0px";
+      this._pullStartY = this._pullMoveY = null;
+      this.config._distResisted = 0;
       setTimeout(() => {
-        this._pullEl.classList.remove("refreshing");
         this.config._state = "pending";
       }, this.config._refreshTimeout);
     },
@@ -128,18 +128,16 @@ export default {
     },
 
     _onTouchStart(event) {
-      if (this.config._state === "pullingUp") {
-        return;
-      }
       if (this.config._state === "pending") {
         if (this._shouldPullToRefresh()) {
           this._pullStartY = this._screenY(event);
         }
+        clearTimeout(this._refreshTimer);
       }
     },
 
     _onTouchMove(event) {
-      if (this.config._state === "pullingUp") {
+      if (!this._shouldPullToRefresh()) {
         return;
       }
       if (!this._pullStartY) {
@@ -188,9 +186,6 @@ export default {
     },
 
     _onTouchEnd() {
-      if (this.config._state === "pullingUp") {
-        return;
-      }
       // wait 1/2 sec before unmounting...
       clearTimeout(this._timeout);
       this._timeout = setTimeout(() => {
@@ -207,17 +202,22 @@ export default {
         this._pullEl.style.height = `${this.config._distReload}px`;
         this._pullEl.classList.add("refreshing");
         this._refreshTimer = setTimeout(() => {
+          if (this.config._loadState === "pullingUp") {
+            this._pullReset();
+            return;
+          }
           let resPromise = null;
           if (this.$listeners["refresh"]) {
             resPromise = this.$listeners.refresh();
           }
           if (resPromise && typeof resPromise.then === "function") {
             resPromise
-              .catch(e => {
+              .catch(() => {
                 this.removePullDownEvent();
               })
               .finally(() => {
                 this._pullReset();
+                this.scrollTo(0);
               });
           } else {
             this._pullReset();
@@ -228,13 +228,7 @@ export default {
           return;
         }
         this._pullReset();
-        this._pullEl.classList.add("pending");
-        this.config._state = "pending";
       }
-      this._pullEl.classList.remove("releasing");
-      this._pullEl.classList.remove("pulling");
-      this._pullStartY = this._pullMoveY = null;
-      this.config._distResisted = 0;
     },
 
     removePullDownEvent() {
@@ -274,6 +268,9 @@ export default {
     },
 
     _pullUpHandler() {
+      if (this.config._loadState === "pullingUp") {
+        return;
+      }
       const { scrollY, innerHeight } = window;
       const { scrollHeight } = document.body;
       if (innerHeight + scrollY >= scrollHeight - 10) {
